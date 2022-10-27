@@ -10,16 +10,16 @@
         <label for="name">Name: </label>
         <input type="text" id="name" name="name" value="Bob" autofocus><br>
         <label for="age">Age: </label>
-        <input type="text" id="age" value="20"><br>
+        <input type="text" id="age" value="21"><br>
         <label for="save-as">Save As: </label>
-        <input type="text" id="save-as" value="Person1"><br>
+        <input type="text" id="save-as" value="Bob"><br>
         <button type="submit" class="save">Save</button>
     </div>
 
     <div class="saved-ctnr">
-        <select name="saved" id="saved" onchange="getData(this)">
-            <option>Person1</option>
-            <option>Person2</option>
+        <select name="saved" id="saved">
+            <!-- <option>Person1</option>
+            <option>Person2</option> -->
         </select>
     </div>
 
@@ -28,9 +28,13 @@
         <div class="display-info"></div>
     </div>
 
+    <div class="delete-ctnr">
+        <button type="submit" class="delete">Delete</button>
+    </div>
 
 
-    <script src="save_data.js"></script>
+
+    <script src="save_retreive_data.js"></script>
 </body>
 
 </html>
