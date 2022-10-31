@@ -2,13 +2,13 @@ let saveBtn = document.querySelector(".save");
 let retreiveBtn = document.querySelector(".retreive");
 let deleteBtn = document.querySelector(".delete");
 let deleteAllBtn = document.querySelector(".delete-all");
-let info = document.querySelector(".display-info")
+let info = document.querySelector(".display-info");
 let saved = document.getElementById("saved");
 
 saveBtn.addEventListener("click", save);
 retreiveBtn.addEventListener("click", retreive);
-deleteBtn.addEventListener("click", deleteItem)
-deleteAllBtn.addEventListener("click", deleteAll)
+deleteBtn.addEventListener("click", deleteItem);
+deleteAllBtn.addEventListener("click", deleteAll);
 
 function checkDup(nameToBeSaved, option) {
     let alreadyExist = [];
@@ -90,7 +90,7 @@ function deleteAll() {
 }
 
 // Load key names from local storage into saved input box
-const keys = Object.keys(localStorage)
+const keys = Object.keys(localStorage);
 for (let key of keys) {
     let option = document.createElement("option");
     option.text = key;
