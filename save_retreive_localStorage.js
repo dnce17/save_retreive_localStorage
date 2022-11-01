@@ -10,91 +10,130 @@ retreiveBtn.addEventListener("click", retreive);
 deleteBtn.addEventListener("click", deleteItem);
 deleteAllBtn.addEventListener("click", deleteAll);
 
-function checkDup(nameToBeSaved, option) {
+// Functions when loading pg
+loadExistingData();
+
+function save() {
+    let existingPeople = JSON.parse(localStorage.getItem("People"));
+
+    if (existingPeople == null) {
+        existingPeople = [];
+    }
+
+    let name = document.getElementById("name").value;
+    let age = document.getElementById("age").value;
+    let savedAs = document.getElementById("save-as").value;
+
+    const person = {
+        savedAs: savedAs,
+        name: name,
+        age: age
+    }
+
+    // Check for duplicate savedAs in localStorage
     let alreadyExist = [];
     for (i = 0; i < saved.length; i++) {
         let maybeDup = saved[i].value;
         alreadyExist.push(maybeDup);
     }
 
-    if (alreadyExist.includes(nameToBeSaved)) {
-        alert("Name already taken. File will be overwritten.");
+    if (alreadyExist.includes(savedAs)) {
+        for (i = 0; i < existingPeople.length; i++) {
+            if (savedAs == existingPeople[i].savedAs) {
+                existingPeople.splice(i, 1);
+                alert("Name already taken. File will be overwritten.");
+                break;
+            }
+        } 
     } else {
+        let option = document.createElement("option");
+        option.text = savedAs;
+
         saved.add(option);
         alert("Save Successful!");
         let saveAs = document.getElementById("save-as")
         saveAs.value = "";
     }
-}
 
-function save() {
-    let name = document.getElementById("name").value;
-    let age = document.getElementById("age").value;
-    let saveAs = document.getElementById("save-as").value; // this is basically what you name your saved file
+    // window.localStorage.setItem("person", JSON.stringify(person));
 
-    const person = {
-        name: name,
-        age: age
-    }
-
-    window.localStorage.setItem(saveAs, JSON.stringify(person));
-    // console.log("Save successful");
-
-    let option = document.createElement("option");
-    option.text = saveAs;
-
-    checkDup(option.value, option)
+    existingPeople.push(person); // push person into the existing array
+    window.localStorage.setItem("People", JSON.stringify(existingPeople)); // show new person + old entries
 }
 
 function retreive() {
-    let key = saved.value;
-    let records = window.localStorage.getItem(key);
+    let keyToLoad = saved.value;
 
-    // Load the saved data
     let name = document.getElementById("name");
     let age = document.getElementById("age");
-    name.value = JSON.parse(records).name;
-    age.value = JSON.parse(records).age;
+
+    const keys = Object.keys(localStorage);
+    for (let key of keys) {
+        if (key == "People") {
+            let jsonObj = JSON.parse(window.localStorage.getItem("People"))
+            console.log(jsonObj);
+
+            for (i = 0; i < jsonObj.length; i++) {
+                console.log(jsonObj[i].name, keyToLoad);
+                if (jsonObj[i].savedAs == keyToLoad) { // Note: Issues if there is 2 Bobs (e.g)
+                    console.log(jsonObj[i].name, keyToLoad);
+                    name.value = jsonObj[i].name;
+                    age.value = jsonObj[i].age;
+                }
+            }
+        }
+    }
 }
 
 function deleteItem() {
-    let key = saved.value;
-    localStorage.removeItem(key);
+    let keyCompare = saved.value;
 
-    // remove the deleted item from saved input box 
-    let alreadyExist = [];
-    for (i = 0; i < saved.length; i++) {
-        let savedName = saved[i].value;
-        alreadyExist.push(savedName);
-    }
-
-    if (alreadyExist.includes(key)) {
-        for (i = 0; i < saved.length; i++) {
-            let savedName = saved[i].value
-            if (key == savedName) {
-                // console.log(saved[i], saved[i].value, key, i);
-                saved.remove(i);
-                alert("File has been deleted")
-            } 
+    const keys = Object.keys(localStorage);
+    for (let key of keys) {
+        if (key == "People") {
+            let jsonStr = window.localStorage.getItem(key); // returns str
+            let jsonObj = JSON.parse(jsonStr); // turns str to obj
+            for (i = 0; i < jsonObj.length; i++) {
+                if (jsonObj[i].savedAs == keyCompare) {
+                    saved.remove(i);
+                    jsonObj.splice(i, 1);
+                    window.localStorage.setItem("People", JSON.stringify(jsonObj));
+                    alert("File has been deleted")
+                    break;
+                }
+            }
         }
     }
 }
 
 function deleteAll() {
-    window.localStorage.clear();
-
-    for (i = saved.length - 1; i >= 0; i--) {
-        console.log(saved[i])
-        saved.remove(i);
+    const keys = Object.keys(localStorage);
+    for (let key of keys) {
+        if (key == "People") {
+            window.localStorage.removeItem(key);
+            for (i = saved.length; i >= 0; i--) {
+                saved.remove(i);
+            }
+            break;
+        }
     }
 }
 
 // Load key names from local storage into saved input box
-const keys = Object.keys(localStorage);
-for (let key of keys) {
-    let option = document.createElement("option");
-    option.text = key;
-    saved.add(option);
+function loadExistingData() {
+    const keys = Object.keys(localStorage);
+    for (let key of keys) {
+        if (key == "People") {
+            let jsonStr = window.localStorage.getItem(key); // returns str
+            let jsonObj = JSON.parse(jsonStr); // turns str to obj
+
+            for (i = 0; i < jsonObj.length; i++) {
+                let option = document.createElement("option");
+                option.text = jsonObj[i].savedAs;
+                saved.add(option);
+            }
+        }
+    }
 }
 
 
@@ -106,6 +145,8 @@ for (let key of keys) {
 // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_select_remove
 // https://stackoverflow.com/questions/41112624/remove-select-option-with-specific-value
 // https://stackoverflow.com/questions/3364493/how-do-i-clear-all-options-in-a-dropdown-box
+// ***My savior: https://stackoverflow.com/questions/19635077/adding-objects-to-array-in-localstorage 
 
 // Of Note
 // remove() rearranges the index, so when you remove all options from select, you might run into issues 
+// splice() targets the original array rather than creating a new one altogether
